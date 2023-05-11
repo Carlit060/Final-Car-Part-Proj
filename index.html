@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" href="style.css" />
+
+    <title>Quiz App</title>
+  </head>
+  <body>
+    <div class="container" id="start">
+      <div class="row quiz_text" id="question__text">
+        <a class="fancy" href="#" onclick="loadDoc()">
+          <span class="top-key"></span>
+          <span class="text">Start Test</span>
+          <span class="bottom-key-1"></span>
+          <span class="bottom-key-2"></span>
+        </a>
+      </div>
+
+      <div class="row images_row" id="question__images"></div>
+      <div id="try-again-message" style="display: none">
+        <p>Sorry, that was incorrect. Please try again.</p>
+      </div>
+    </div>
+    <div class="container" id="end" style="display: none">
+      <div class="row quiz_text" id="question__text">
+        <span class="top-key"></span>
+        <span class="text">Completed</span>
+        <span class="bottom-key-1"></span>
+        <span class="bottom-key-2"></span>
+      </div>
+    </div>
+
+    <script>
+      var quizArray = [];
+      var metaData = [];
+      var currentQuestionIndex = 0;
+      function loadDoc() {
+        const xhttp = new XMLHttpRequest();
+        xhttp.onload = function () {
+          quizArray = this.responseText.split("#");
+          metaData = quizArray.splice(0, 1)[0].split("\n");
+          metaData.splice(0, 1);
+
+          let currentQuestion = quizArray[currentQuestionIndex].split("?");
+          let question = (document.getElementById("question__text").innerHTML =
+            currentQuestion[0]);
+
+          let DivImages = document.createElement("div");
+          let answers = currentQuestion[1].split("\n");
+
+          for (let i = 1; i < 5; i++) {
+            let temp = answers[i].split(". ");
+            temp.splice(0, 1);
+
+            let imageName = temp[0];
+            let img = document.createElement("img");
+            img.onclick = matchImage;
+            img.src = "./pictures/" + imageName;
+            img.value = imageName;
+
+            DivImages.appendChild(img);
+          }
+
+          document.getElementById("question__images").innerHTML = "";
+          document.getElementById("question__images").appendChild(DivImages);
+        };
+        xhttp.open("GET", "quiz.txt");
+        xhttp.send();
+      }
+
+      function matchImage(e) {
+        let temp = metaData[currentQuestionIndex].split(" ");
+        temp.splice(0, 1);
+        let check = temp.join(" ");
+
+        if (e.target.value === check) {
+          console.log(currentQuestionIndex);
+          if (currentQuestionIndex == 9) {
+            var startQuiz = document.getElementById("start");
+            startQuiz.style.display = "none";
+            var endQuiz = document.getElementById("end");
+            endQuiz.style.display = "block";
+          } else {
+            var tryAgainMessage = document.getElementById("try-again-message");
+            tryAgainMessage.style.display = "none";
+            currentQuestionIndex = currentQuestionIndex + 1;
+
+            let currentQuestion = quizArray[currentQuestionIndex].split("?");
+            let question = (document.getElementById(
+              "question__text"
+            ).innerHTML = currentQuestion[0]);
+
+            let DivImages = document.createElement("div");
+            let answers = currentQuestion[1].split("\n");
+
+            for (let i = 1; i < 5; i++) {
+              let temp = answers[i].split(". ");
+              temp.splice(0, 1);
+
+              let imageName = temp[0];
+              let img = document.createElement("img");
+              img.onclick = matchImage;
+              img.src = "./pictures/" + imageName;
+              img.value = imageName;
+
+              DivImages.appendChild(img);
+            }
+
+            document.getElementById("question__images").innerHTML = "";
+            document.getElementById("question__images").appendChild(DivImages);
+          }
+        } else {
+          var tryAgainMessage = document.getElementById("try-again-message");
+          tryAgainMessage.style.display = "block";
+        }
+      }
+    </script>
+  </body>
+</html>
